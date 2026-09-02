@@ -1,3 +1,13 @@
 spring:
   application:
     name: pulseboard
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pulseboard
+    username: pulseboard_user
+    password: ${PULSEBOARD_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
