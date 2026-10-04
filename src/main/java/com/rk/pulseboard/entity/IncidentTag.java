@@ -1,33 +1,37 @@
 package com.rk.pulseboard.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "incident_tags")
 public class IncidentTag {
-    @Column(nullable = false)
-    private String incidentId;
+    @EmbeddedId
+    private IncidentTagId id = new IncidentTagId();
 
-    @Column(nullable = false)
-    private String tagId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("incidentId")
+    @JoinColumn(name = "incident_id", nullable = false)
+    private Incident incident;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("tagId")
+    @JoinColumn(name = "tag_id", nullable = false)
+    private Tag tag;
 
     public IncidentTag() {}
 
-    public String getIncidentId() {
-        return incidentId;
+    public IncidentTag(Incident incident, Tag tag) {
+        this.incident = incident;
+        this.tag = tag;
+        this.id = new IncidentTagId(incident.getId(), tag.getId());
     }
 
-    public void setIncidentId(String incidentId) {
-        this.incidentId = incidentId;
-    }
+    public IncidentTagId getId() { return id; }
+    public void setId(IncidentTagId id) { this.id = id; }
 
-    public String getTagId() {
-        return tagId;
-    }
+    public Incident getIncident() { return incident; }
+    public void setIncident(Incident incident) { this.incident = incident; }
 
-    public void setTagId(String tagId) {
-        this.tagId = tagId;
-    }
+    public Tag getTag() { return tag; }
+    public void setTag(Tag tag) { this.tag = tag; }
 }

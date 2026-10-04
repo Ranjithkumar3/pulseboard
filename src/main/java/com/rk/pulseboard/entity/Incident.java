@@ -3,9 +3,9 @@ package com.rk.pulseboard.entity;
 import com.rk.pulseboard.entity.enums.Severity;
 import com.rk.pulseboard.entity.enums.Status;
 import jakarta.persistence.*;
-
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="incidents")
@@ -33,7 +33,9 @@ public class Incident {
 
     private String assigneeId;
 
-    private String tags;
+    // Single source of truth for tag relationships managed through the explicit join table
+    @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IncidentTag> incidentTags = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -58,99 +60,49 @@ public class Incident {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
+    // Helper methods to safely manage tags sync
+    public void addTag(Tag tag) {
+        IncidentTag incidentTag = new IncidentTag(this, tag);
+        incidentTags.add(incidentTag);
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void removeTag(Tag tag) {
+        incidentTags.removeIf(it -> it.getIncident().equals(this) && it.getTag().equals(tag));
     }
 
-    public String getTitle() {
-        return title;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
 
-    public Status getStatus() {
-        return status;
-    }
+    public Severity getSeverity() { return severity; }
+    public void setSeverity(Severity severity) { this.severity = severity; }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+    public String getCreatorId() { return creatorId; }
+    public void setCreatorId(String creatorId) { this.creatorId = creatorId; }
 
-    public Severity getSeverity() {
-        return severity;
-    }
+    public String getAssigneeId() { return assigneeId; }
+    public void setAssigneeId(String assigneeId) { this.assigneeId = assigneeId; }
 
-    public void setSeverity(Severity severity) {
-        this.severity = severity;
-    }
+    public List<IncidentTag> getIncidentTags() { return incidentTags; }
+    public void setIncidentTags(List<IncidentTag> incidentTags) { this.incidentTags = incidentTags; }
 
-    public String getCreatorId() {
-        return creatorId;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public void setCreatorId(String creatorId) {
-        this.creatorId = creatorId;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public String getAssigneeId() {
-        return assigneeId;
-    }
+    public LocalDateTime getResolvedAt() { return resolvedAt; }
+    public void setResolvedAt(LocalDateTime resolvedAt) { this.resolvedAt = resolvedAt; }
 
-    public void setAssigneeId(String assigneeId) {
-        this.assigneeId = assigneeId;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getResolvedAt() {
-        return resolvedAt;
-    }
-
-    public void setResolvedAt(LocalDateTime resolvedAt) {
-        this.resolvedAt = resolvedAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
-    }
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 }
